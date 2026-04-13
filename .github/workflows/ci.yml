@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - master
   pull_request:
 env:
   # Default version of Go to use by CI workflows. This should be the latest
@@ -12,12 +13,12 @@ env:
   # backwards compatibility with the previous two minor releases and we
   # explicitly test our code for these versions so keeping this at prior
   # versions does not add value.
-  DEFAULT_GO_VERSION: "~1.26.0"
+  DEFAULT_GO_VERSION: ~1.26.0
 # Declare default permissions as read only.
 permissions: read-all
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -28,7 +29,7 @@ jobs:
         with:
           go-version: ${{ env.DEFAULT_GO_VERSION }}
           check-latest: true
-          cache-dependency-path: "**/go.sum"
+          cache-dependency-path: '**/go.sum'
       - name: Tools cache
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         env:
@@ -54,7 +55,7 @@ jobs:
         run: make check-clean-work-tree
 
   govulncheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -65,7 +66,7 @@ jobs:
         with:
           go-version: ${{ env.DEFAULT_GO_VERSION }}
           check-latest: true
-          cache-dependency-path: "**/go.sum"
+          cache-dependency-path: '**/go.sum'
       - name: Tools cache
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         env:
@@ -85,7 +86,7 @@ jobs:
         run: make govulncheck
 
   test-bench:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -97,12 +98,12 @@ jobs:
         uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
           go-version: ${{ env.DEFAULT_GO_VERSION }}
-          cache-dependency-path: "**/go.sum"
+          cache-dependency-path: '**/go.sum'
       - name: Run benchmarks to check functionality
         run: make test-bench
 
   test-race:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -111,12 +112,12 @@ jobs:
         with:
           go-version: ${{ env.DEFAULT_GO_VERSION }}
           check-latest: true
-          cache-dependency-path: "**/go.sum"
+          cache-dependency-path: '**/go.sum'
       - name: Run tests with race detector
         run: make test-race
 
   test-concurrent-safe:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -125,12 +126,12 @@ jobs:
         with:
           go-version: ${{ env.DEFAULT_GO_VERSION }}
           check-latest: true
-          cache-dependency-path: "**/go.sum"
+          cache-dependency-path: '**/go.sum'
       - name: Run ConcurrentSafe tests multiple times with race detector
         run: make test-concurrent-safe
 
   test-coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -139,7 +140,7 @@ jobs:
         with:
           go-version: ${{ env.DEFAULT_GO_VERSION }}
           check-latest: true
-          cache-dependency-path: "**/go.sum"
+          cache-dependency-path: '**/go.sum'
       - name: Run coverage tests
         run: make test-coverage
       - name: Store coverage test output
@@ -149,7 +150,7 @@ jobs:
           path: coverage.txt
 
   codecov:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [test-coverage]
     steps:
       - name: Checkout Repo
@@ -167,21 +168,21 @@ jobs:
   compatibility-test:
     strategy:
       matrix:
-        go-version: ["1.26.0", "1.25.0"]
+        go-version: [1.26.0, 1.25.0]
         platform:
-          - os: ubuntu-latest
-            arch: "386"
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
+            arch: '386'
+          - os: ubuntu-24.04
             arch: amd64
           - os: ubuntu-22.04-arm
             arch: arm64
-          - os: macos-latest
+          - os: macos-15
             arch: amd64
-          - os: macos-latest
+          - os: macos-15
             arch: arm64
-          - os: windows-latest
-            arch: "386"
-          - os: windows-latest
+          - os: windows-2025
+            arch: '386'
+          - os: windows-2025
             arch: amd64
     runs-on: ${{ matrix.platform.os }}
     steps:
@@ -192,14 +193,14 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
           check-latest: true
-          cache-dependency-path: "**/go.sum"
+          cache-dependency-path: '**/go.sum'
       - name: Run tests
         env:
           GOARCH: ${{ matrix.platform.arch }}
         run: make test-short
 
   test-compatibility:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [compatibility-test]
     if: always()
     steps:

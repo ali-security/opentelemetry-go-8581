@@ -12,11 +12,12 @@ on:
       - main
 
 # Declare default permissions as read only.
+      - master
 permissions: read-all
 
 jobs:
   changelog:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'dependencies') && !contains(github.event.pull_request.labels.*.name, 'Skip Changelog') && !contains(github.event.pull_request.title, '[chore]')}}
 
     steps:
